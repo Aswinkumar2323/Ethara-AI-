@@ -336,6 +336,6 @@ if (fs.existsSync(staticPath)) {
   console.log('Development mode detected: Frontend dist not found at', staticPath);
 }
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
 });
