@@ -13,10 +13,26 @@ const prisma = new PrismaClient();
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';
 
+console.log('--- Startup Debug ---');
+console.log('PORT:', PORT);
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('__dirname:', __dirname);
+
 // Health check
 app.get('/health', (req, res) => {
   res.send('Server is running');
 });
+
+// Database check
+async function checkDb() {
+  try {
+    await prisma.$connect();
+    console.log('Database connected successfully');
+  } catch (err) {
+    console.error('Database connection failed:', err);
+  }
+}
+checkDb();
 
 app.use(cors());
 app.use(express.json());
@@ -309,9 +325,11 @@ app.get('/api/dashboard', authenticateToken, async (req: any, res) => {
 });
 
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../../frontend/dist')));
+  const staticPath = path.join(__dirname, '../../frontend/dist');
+  console.log('Serving static files from:', staticPath);
+  app.use(express.static(staticPath));
   app.use((req, res) => {
-    res.sendFile(path.resolve(__dirname, '../../frontend/dist', 'index.html'));
+    res.sendFile(path.resolve(staticPath, 'index.html'));
   });
 }
 
