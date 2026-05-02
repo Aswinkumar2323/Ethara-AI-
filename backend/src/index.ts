@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import path from 'path';
 
 dotenv.config();
 
@@ -11,6 +12,11 @@ const app = express();
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';
+
+// Health check
+app.get('/health', (req, res) => {
+  res.send('Server is running');
+});
 
 app.use(cors());
 app.use(express.json());
@@ -302,7 +308,6 @@ app.get('/api/dashboard', authenticateToken, async (req: any, res) => {
   }
 });
 
-import path from 'path';
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../../frontend/dist')));
   app.use((req, res) => {
