@@ -5,6 +5,7 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import path from 'path';
+import fs from 'fs';
 
 dotenv.config();
 
@@ -324,13 +325,15 @@ app.get('/api/dashboard', authenticateToken, async (req: any, res) => {
   }
 });
 
-if (process.env.NODE_ENV === 'production') {
-  const staticPath = path.join(__dirname, '../../frontend/dist');
-  console.log('Serving static files from:', staticPath);
+const staticPath = path.join(__dirname, '../../frontend/dist');
+if (fs.existsSync(staticPath)) {
+  console.log('Production mode detected: Serving static files from:', staticPath);
   app.use(express.static(staticPath));
   app.use((req, res) => {
     res.sendFile(path.resolve(staticPath, 'index.html'));
   });
+} else {
+  console.log('Development mode detected: Frontend dist not found at', staticPath);
 }
 
 app.listen(PORT, () => {
