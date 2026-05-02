@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Team Task Manager Full-Stack Application",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.19.0"
   },
   "scripts": {
     "install": "cd frontend && npm install && cd ../backend && npm install",
