@@ -1,71 +1,131 @@
-# Team Task Manager
+# Ethara-AI: Modern Team Task Manager
 
-A full-stack application built to manage teams, projects, and tasks with role-based access control.
+Ethara-AI is a state-of-the-art, full-stack team task management application designed with a focus on high-performance, security, and a premium user experience. Built with a robust **Node.js/Express** backend and a dynamic **React/Vite** frontend, it leverages **Prisma ORM** for seamless database management and **Railway** for reliable production deployments.
 
-## Features
-- **Authentication**: JWT-based secure signup and login.
-- **Projects**: Create projects and manage team members (Admin / Member roles).
-- **Task Management**: Create tasks, assign them to members, set due dates, and update statuses (TODO, IN_PROGRESS, DONE).
-- **Dashboard Overview**: View aggregated stats on task progress and easily access your projects.
-- **Rich Aesthetics**: Deep dark mode, neon accents, glassmorphism, and smooth animations using Vanilla CSS.
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 
-## Tech Stack
-- **Frontend**: React, Vite, React Router, Context API, Vanilla CSS.
-- **Backend**: Node.js, Express.js, TypeScript.
-- **Database & ORM**: PostgreSQL, Prisma.
-- **Deployment**: Configured for Railway deployment out-of-the-box.
+---
 
-## Local Development (Quick Start)
+## 🚀 Key Features
+
+- **🔐 Secure Authentication**: Robust user registration and login system utilizing JWT (JSON Web Tokens) and Bcrypt password hashing.
+- **📊 Interactive Dashboard**: Real-time overview of task statistics including Todo, In Progress, Done, and Overdue tracking.
+- **📂 Project Management**: Create and manage multiple projects, each with its own isolated environment and team members.
+- **✅ Dynamic Task Board**: Kanban-style task management allowing status updates, assignments, and due date tracking.
+- **👥 Team Collaboration**: Add members to projects via email and manage roles (Admin/Member) to control access.
+- **🎨 Premium UI/UX**: A modern, glassmorphic design system built for clarity, speed, and responsiveness.
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+- **Framework**: [React](https://reactjs.org/) (via [Vite](https://vitejs.dev/))
+- **Styling**: Modern CSS with Glassmorphism principles
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Networking**: [Axios](https://axios-http.com/)
+- **Routing**: [React Router](https://reactrouter.com/)
+
+### Backend
+- **Environment**: [Node.js](https://nodejs.org/)
+- **Framework**: [Express.js](https://expressjs.com/)
+- **Database**: [PostgreSQL](https://www.postgresql.org/)
+- **ORM**: [Prisma](https://www.prisma.io/)
+- **Auth**: JWT & Bcrypt
+
+### DevOps & Deployment
+- **Platform**: [Railway](https://railway.app/)
+- **CI/CD**: GitHub Integration
+- **Containerization**: Nixpacks / Railpack
+
+---
+
+## ⚙️ Installation & Setup
 
 ### Prerequisites
-- Node.js (v18+)
-- SQLite (pre-configured for local dev) or PostgreSQL.
+- Node.js (v20+)
+- PostgreSQL Database
+- npm or yarn
 
-### Setup
-1. Install dependencies from the root directory:
-   ```bash
-   npm install
-   ```
+### 1. Clone the Repository
+```bash
+git clone https://github.com/Aswinkumar2323/Ethara-AI-.git
+cd Ethara-AI-
+```
 
-2. Initialize the database (SQLite by default for local):
-   ```bash
-   cd backend
-   npx prisma db push
-   npx prisma generate
-   ```
+### 2. Install Dependencies
+Install dependencies for both the root and sub-packages:
+```bash
+npm install
+```
+*(This triggers a custom `install` and `postinstall` script to set up both frontend and backend automatically.)*
 
-3. Start the application:
-   - Terminal 1 (Backend): `cd backend && npm run dev`
-   - Terminal 2 (Frontend): `cd frontend && npm run dev`
+### 3. Environment Variables
+Create a `.env` file in the `backend/` directory:
+```env
+DATABASE_URL="your-postgresql-url"
+JWT_SECRET="your-secure-secret-key"
+PORT=5000
+```
 
-## Deployment to Railway
+### 4. Database Setup
+Synchronize the Prisma schema with your database:
+```bash
+npx prisma db push
+```
 
-This repository is structured as a monorepo specifically configured to deploy easily on Railway as a single Web Service.
+### 5. Running Locally
+Start the development server for both frontend and backend:
+```bash
+# From the root directory
+npm run dev
+```
 
-1. **Push to GitHub**:
-   ```bash
-   git add .
-   git commit -m "Initial commit"
-   git push origin main
-   ```
+---
 
-2. **Deploy on Railway**:
-   - Go to [Railway](https://railway.app/).
-   - Click **New Project** > **Deploy from GitHub repo**.
-   - Select your newly created repository.
-   - Add a **PostgreSQL Database** to your Railway project.
+## 📁 Project Structure
 
-3. **Configure Environment Variables**:
-   In your Web Service on Railway, set the following environment variables:
-   - `DATABASE_URL`: Add the connection string from your Railway Postgres database.
-   - `JWT_SECRET`: A strong random string for JWT signing.
-   - `NODE_ENV`: `production`
-   - `PORT`: Automatically set by Railway (or set to `5000`).
+```text
+Ethara-AI/
+├── backend/            # Express server & API routes
+│   ├── src/            # TypeScript source code
+│   └── dist/           # Compiled JavaScript
+├── frontend/           # React application
+│   ├── src/            # Components, Pages, Context
+│   └── dist/           # Production build
+├── prisma/             # Database schema & migrations
+├── Procfile            # Deployment configuration
+└── railway.json        # Infrastructure configuration
+```
 
-4. **Migrate Production Database**:
-   Since Prisma requires an initial schema push for a new database, you may need to run this command in the Railway "Command" panel for the web service, or update the `build` script to include `npx prisma db push --accept-data-loss`.
+---
 
-## Submission Details
-- **Live URL**: (To be added after deployment)
-- **GitHub Repo**: (Your repository URL)
-- **Demo Video**: Record your 2-5 min Loom or OBS video and attach the link!
+## 🛡️ Security Best Practices
+- **Passwords**: Never stored in plain text; hashed with Bcrypt (salt rounds: 10).
+- **API Security**: Protected routes require valid JWT tokens.
+- **CORS**: Configured to restrict cross-origin requests to trusted domains.
+- **Robustness**: Implemented global error handlers to prevent silent crashes and data leaks.
+
+---
+
+## 📜 License
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+## 🤝 Contributing
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+**Developed with ❤️ by [Aswin Kumar](https://github.com/Aswinkumar2323)**
