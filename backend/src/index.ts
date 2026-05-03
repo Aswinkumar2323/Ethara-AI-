@@ -11,6 +11,14 @@ dotenv.config();
 
 const app = express();
 
+// ✅ Catch-all for errors to prevent silent crashes
+process.on('uncaughtException', (err) => {
+  console.error('💥 CRITICAL: Uncaught Exception:', err);
+});
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('💥 CRITICAL: Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
 // ✅ Prisma singleton (prevents connection explosion in serverless)
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
@@ -225,7 +233,8 @@ app.use((req, res) => {
   res.status(404).send('Frontend build not found. Please run build first.');
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 SERVER IS LIVE ON PORT ${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 SERVER IS LIVE AND LISTENING ON 0.0.0.0:${PORT}`);
   console.log(`Debug: Node version: ${process.version}`);
+  console.log(`Debug: CWD: ${process.cwd()}`);
 });
