@@ -204,6 +204,44 @@ app.get('/api/projects', authenticateToken, async (req: any, res) => {
   }
 });
 
+// ================= DASHBOARD =================
+app.get('/api/dashboard', authenticateToken, async (req: any, res) => {
+  try {
+    const userId = req.user.id;
+
+    const [todoCount, inProgressCount, doneCount, recentTasks] = await Promise.all([
+      prisma.task.count({ where: { project: { members: { some: { userId } } }, status: 'TODO' } }),
+      prisma.task.count({ where: { project: { members: { some: { userId } } }, status: 'IN_PROGRESS' } }),
+      prisma.task.count({ where: { project: { members: { some: { userId } } }, status: 'DONE' } }),
+      prisma.task.findMany({
+        where: { project: { members: { some: { userId } } } },
+        take: 5,
+        orderBy: { createdAt: 'desc' },
+        include: { project: { select: { name: true } } }
+      })
+    ]);
+
+    const overdueCount = await prisma.task.count({
+      where: {
+        project: { members: { some: { userId } } },
+        status: { not: 'DONE' },
+        dueDate: { lt: new Date() }
+      }
+    });
+
+    return res.json({
+      todoCount,
+      inProgressCount,
+      doneCount,
+      overdueCount,
+      recentTasks
+    });
+  } catch (error) {
+    console.error('[Dashboard Error]', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // ================= GLOBAL ERROR HANDLER =================
 
 app.use((err: any, req: any, res: any, next: any) => {
