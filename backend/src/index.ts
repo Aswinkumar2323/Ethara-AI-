@@ -209,7 +209,7 @@ if (fs.existsSync(staticPath)) {
   });
 }
 
-// ❌ REMOVE app.listen()
 
-// ✅ EXPORT FOR SERVERLESS
-export default app;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
