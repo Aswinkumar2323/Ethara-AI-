@@ -36,6 +36,11 @@ console.log(`Debug: NODE_ENV is ${process.env.NODE_ENV}`);
 app.use(cors());
 app.use(express.json());
 
+app.use((req, res, next) => {
+  console.log(`📡 [${new Date().toISOString()}] ${req.method} ${req.path}`);
+  next();
+});
+
 // --- Health ---
 app.get('/health', (req, res) => {
   console.log('❤️ Health check pinged');
@@ -220,7 +225,7 @@ app.use((req, res) => {
   res.status(404).send('Frontend build not found. Please run build first.');
 });
 
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, () => {
   console.log(`🚀 SERVER IS LIVE ON PORT ${PORT}`);
   console.log(`Debug: Node version: ${process.version}`);
 });
