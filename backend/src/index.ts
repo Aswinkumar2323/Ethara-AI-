@@ -205,6 +205,9 @@ console.log('Debug: Checking static path at:', staticPath);
 if (fs.existsSync(staticPath)) {
   console.log('✅ Static files found, serving frontend');
   app.use(express.static(staticPath));
+} else {
+  console.warn('⚠️ Static files NOT found at:', staticPath);
+}
 
 app.use((req, res) => {
   if (req.path.startsWith('/api')) {
