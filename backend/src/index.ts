@@ -242,6 +242,116 @@ app.get('/api/dashboard', authenticateToken, async (req: any, res) => {
   }
 });
 
+// ================= USERS =================
+app.get('/api/users', authenticateToken, async (req, res) => {
+  try {
+    const users = await prisma.user.findMany({
+      select: { id: true, name: true, email: true }
+    });
+    return res.json(users);
+  } catch (error) {
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ================= PROJECT DETAILS =================
+app.get('/api/projects/:id', authenticateToken, async (req: any, res) => {
+  try {
+    const { id } = req.params;
+    const project = await prisma.project.findUnique({
+      where: { id },
+      include: {
+        members: { include: { user: { select: { id: true, name: true, email: true } } } },
+        tasks: { include: { assignee: { select: { id: true, name: true } } } }
+      }
+    });
+
+    if (!project) return res.status(404).json({ error: 'Project not found' });
+
+    // Check if user is member
+    const isMember = project.members.some(m => m.userId === req.user.id);
+    if (!isMember) return res.status(403).json({ error: 'Forbidden' });
+
+    const isCurrentUserAdmin = project.members.find(m => m.userId === req.user.id)?.role === 'ADMIN';
+
+    return res.json({ ...project, isCurrentUserAdmin });
+  } catch (error) {
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.post('/api/projects/:id/tasks', authenticateToken, async (req: any, res) => {
+  try {
+    const { id } = req.params;
+    const { title, description, assigneeId, dueDate } = req.body;
+
+    const task = await prisma.task.create({
+      data: {
+        title,
+        description,
+        projectId: id,
+        assigneeId: assigneeId || null,
+        dueDate: dueDate ? new Date(dueDate) : null
+      }
+    });
+
+    return res.json(task);
+  } catch (error) {
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.post('/api/projects/:id/members', authenticateToken, async (req: any, res) => {
+  try {
+    const { id } = req.params;
+    const { email, role } = req.body;
+
+    const userToAdd = await prisma.user.findUnique({ where: { email } });
+    if (!userToAdd) return res.status(404).json({ error: 'User not found' });
+
+    const member = await prisma.projectMember.create({
+      data: {
+        projectId: id,
+        userId: userToAdd.id,
+        role: role || 'MEMBER'
+      }
+    });
+
+    return res.json(member);
+  } catch (error) {
+    if (error.code === 'P2002') return res.status(400).json({ error: 'User is already a member' });
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.delete('/api/projects/:id/members/:userId', authenticateToken, async (req: any, res) => {
+  try {
+    const { id, userId } = req.params;
+    await prisma.projectMember.delete({
+      where: {
+        projectId_userId: { projectId: id, userId }
+      }
+    });
+    return res.json({ message: 'Member removed' });
+  } catch (error) {
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.put('/api/tasks/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const task = await prisma.task.update({
+      where: { id },
+      data: { status }
+    });
+    return res.json(task);
+  } catch (error) {
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // ================= GLOBAL ERROR HANDLER =================
 
 app.use((err: any, req: any, res: any, next: any) => {
