@@ -206,15 +206,15 @@ if (fs.existsSync(staticPath)) {
   console.log('✅ Static files found, serving frontend');
   app.use(express.static(staticPath));
 
-  app.get(/^(?!\/api).+/, (req, res) => {
-    res.sendFile(path.resolve(staticPath, 'index.html'));
-  });
-} else {
-  console.warn('⚠️ Static files NOT found at:', staticPath);
-  app.get(/^(?!\/api).+/, (req, res) => {
-    res.status(404).send('Frontend build not found. Please run build first.');
-  });
-}
+app.use((req, res) => {
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({ error: 'API route not found' });
+  }
+  if (fs.existsSync(staticPath)) {
+    return res.sendFile(path.resolve(staticPath, 'index.html'));
+  }
+  res.status(404).send('Frontend build not found. Please run build first.');
+});
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 SERVER IS LIVE ON PORT ${PORT}`);
