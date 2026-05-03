@@ -11,6 +11,6 @@
     "start": "cd backend && node dist/index.js"
   },
   "prisma": {
-    "schema": "backend/prisma/schema.prisma"
+    "schema": "prisma/schema.prisma"
   }
 }
