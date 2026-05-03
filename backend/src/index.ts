@@ -236,7 +236,7 @@ app.get('/api/dashboard', authenticateToken, async (req: any, res) => {
       overdueCount,
       recentTasks
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('[Dashboard Error]', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
@@ -318,7 +318,7 @@ app.post('/api/projects/:id/members', authenticateToken, async (req: any, res) =
     });
 
     return res.json(member);
-  } catch (error) {
+  } catch (error: any) {
     if (error.code === 'P2002') return res.status(400).json({ error: 'User is already a member' });
     return res.status(500).json({ error: 'Internal server error' });
   }
