@@ -41,16 +41,14 @@ app.get('/health', (req, res) => {
   return res.status(200).send('Server is running');
 });
 
-// --- DB Check (fail fast) ---
-(async () => {
-  try {
-    await prisma.$connect();
-    console.log('✅ Database connected');
-  } catch (err) {
-    console.error('❌ DB connection failed at startup:', err);
-    // Don't exit(1) immediately, let the server start so we can see logs/health
-  }
-})();
+// --- DB Check (async) ---
+console.log('🔄 Attempting database connection...');
+prisma.$connect()
+  .then(() => console.log('✅ Database connected successfully'))
+  .catch(err => {
+    console.error('❌ DB connection failed:', err.message);
+    // We don't exit, so the server stays up and we can see the error in logs
+  });
 
 // --- Auth Middleware ---
 const authenticateToken = (req: any, res: any, next: any) => {
@@ -202,16 +200,23 @@ app.use((err: any, req: any, res: any, next: any) => {
 // ================= STATIC (SAFE) =================
 
 const staticPath = path.join(__dirname, '../../frontend/dist');
+console.log('Debug: Checking static path at:', staticPath);
 
 if (fs.existsSync(staticPath)) {
+  console.log('✅ Static files found, serving frontend');
   app.use(express.static(staticPath));
 
   app.use('*', (req, res) => {
     res.sendFile(path.resolve(staticPath, 'index.html'));
   });
+} else {
+  console.warn('⚠️ Static files NOT found at:', staticPath);
+  app.get('*', (req, res) => {
+    res.status(404).send('Frontend build not found. Please run build first.');
+  });
 }
 
-
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🚀 SERVER IS LIVE ON PORT ${PORT}`);
+  console.log(`Debug: Node version: ${process.version}`);
 });
