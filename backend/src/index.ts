@@ -206,12 +206,12 @@ if (fs.existsSync(staticPath)) {
   console.log('✅ Static files found, serving frontend');
   app.use(express.static(staticPath));
 
-  app.use('*', (req, res) => {
+  app.get(/^(?!\/api).+/, (req, res) => {
     res.sendFile(path.resolve(staticPath, 'index.html'));
   });
 } else {
   console.warn('⚠️ Static files NOT found at:', staticPath);
-  app.get('*', (req, res) => {
+  app.get(/^(?!\/api).+/, (req, res) => {
     res.status(404).send('Frontend build not found. Please run build first.');
   });
 }
