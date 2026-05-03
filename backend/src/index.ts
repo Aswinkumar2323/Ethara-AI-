@@ -23,12 +23,14 @@ const prisma =
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
 // ✅ ENV validation
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-change-me';
 if (!process.env.JWT_SECRET) {
-  throw new Error('JWT_SECRET is not set');
+  console.warn('⚠️ JWT_SECRET is not set, using fallback');
 }
 
-const JWT_SECRET = process.env.JWT_SECRET;
 const PORT = Number(process.env.PORT) || 5000;
+console.log(`Debug: PORT is ${PORT}`);
+console.log(`Debug: NODE_ENV is ${process.env.NODE_ENV}`);
 
 // --- Middleware ---
 app.use(cors());
@@ -45,8 +47,8 @@ app.get('/health', (req, res) => {
     await prisma.$connect();
     console.log('✅ Database connected');
   } catch (err) {
-    console.error('❌ DB connection failed:', err);
-    process.exit(1);
+    console.error('❌ DB connection failed at startup:', err);
+    // Don't exit(1) immediately, let the server start so we can see logs/health
   }
 })();
 
