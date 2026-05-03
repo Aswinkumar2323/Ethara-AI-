@@ -38,6 +38,7 @@ app.use(express.json());
 
 // --- Health ---
 app.get('/health', (req, res) => {
+  console.log('❤️ Health check pinged');
   return res.status(200).send('Server is running');
 });
 
